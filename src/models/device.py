@@ -36,11 +36,11 @@ class PC(Device):
         super().__init__(id, "PC", status, group_id)
 
     
-class Router(Device):
-    def __init__(self, id, status = '', group_id = 0):
-        super().__init__(id, "Router", status, group_id)
-
-
 class Switch(Device):
     def __init__(self, id, status = '', group_id = 0):
         super().__init__(id, "Switch", status, group_id)
+
+
+class Router(Device):
+    def __init__(self, id, status = '', group_id = 0):
+        super().__init__(id, "Router", status, group_id)
