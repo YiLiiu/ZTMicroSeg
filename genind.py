@@ -5,9 +5,9 @@ import random
 
 class GenindNetwork:
 
-    def __init__(self, N1, Type1, U2, N2, Type2, U3, N3, Type3):
+    def __init__(self, N1, Type1, U2, N2, U3, N3):
         self.node_labels = {}
-        self.graph = self.MULTI_GRAPHGENERATOR_AND_DRAW(N1, Type1, U2, N2, Type2, U3, N3, Type3)
+        self.graph = self.MULTI_GRAPHGENERATOR_AND_DRAW(N1, Type1, U2, N2, U3, N3)
 
 
 
@@ -23,34 +23,16 @@ class GenindNetwork:
             raise ValueError("Invalid topology type specified.")
         return G
 
-    def ControlZone_graphGenerator(self, N, U, topology_types=["mesh", "star", "ring", "bus"]):
-        if U <= N:
-            controller_nodes = list(range(U))
-        else:
-            controller_nodes = random.sample(range(N), U)
-        G = nx.Graph()
-        G.add_nodes_from(range(N))
-        for node in controller_nodes:
-            topology_type = random.choice(topology_types)
-            if topology_type == "mesh":
-                for n in range(N):
-                    if n != node:
-                        G.add_edge(node, n)
-            elif topology_type == "star":
-                if controller_nodes:
-                    center_node = controller_nodes[0]  # Assume the first controller node is the center for star topology
-                    if node != center_node:
-                        G.add_edge(center_node, node)
-            elif topology_type == "ring":
-                nodes = [n for n in range(N) if n != node]
-                for i in range(len(nodes)):
-                    G.add_edge(nodes[i], nodes[(i + 1) % len(nodes)])
-            elif topology_type == "bus":
-                if controller_nodes:
-                    bus_node = controller_nodes[0]  # Assume the first controller node acts as a bus
-                    for n in range(N):
-                        if n != bus_node:
-                            G.add_edge(bus_node, n)
+    def ControlZone_graphGenerator(self, N, topology_types=["mesh", "star", "ring", "bus"]):
+        toplogy = random.choice(topology_types)
+        if toplogy == "mesh":
+            G = nx.complete_graph(N)
+        elif toplogy == "star":
+            G = nx.star_graph(N - 1)
+        elif toplogy == "ring":
+            G = nx.cycle_graph(N)
+        elif toplogy == "bus":
+            G = nx.path_graph(N)
         return G
 
     def adjust_node_ids(self, G, offset):
@@ -58,10 +40,10 @@ class GenindNetwork:
         mapping = {node: node + offset for node in G.nodes}
         return nx.relabel_nodes(G, mapping)
 
-    def MULTI_GRAPHGENERATOR_AND_DRAW(self, N1, Type1, U2, N2, Type2, U3, N3, Type3):
+    def MULTI_GRAPHGENERATOR_AND_DRAW(self, N1, Type1, U2, N2, U3, N3):
         G1 = self.NetworkZone_graphGenerator(N1, Type1)
-        G2_list = [self.ControlZone_graphGenerator(N2, 1, [Type2]) for _ in range(U2)]
-        G3_list = [self.ControlZone_graphGenerator(N3, 1, [Type3]) for _ in range(U3)]
+        G2_list = [self.ControlZone_graphGenerator(N2) for _ in range(U2)]
+        G3_list = [self.ControlZone_graphGenerator(N3) for _ in range(U3)]
         
         big_graph = G1.copy()
         node_colors = {node: 'red' for node in G1.nodes}  # 为G1节点分配颜色
@@ -72,6 +54,7 @@ class GenindNetwork:
         for i, G2 in enumerate(G2_list):
             G2_adjusted = self.adjust_node_ids(G2, offset)
             controller_node = list(G1.nodes)[i % len(G1.nodes)]
+
             big_graph = nx.compose(big_graph, G2_adjusted)
             big_graph.add_edge(controller_node, min(G2_adjusted.nodes))
             for node in G2_adjusted.nodes:
@@ -86,7 +69,7 @@ class GenindNetwork:
         for G3 in G3_list:
             G2 = next(G2_cycle)
             G3_adjusted = self.adjust_node_ids(G3, offset)
-            controller_node_G2 = min(G2.nodes())
+            controller_node_G2 = random.choice(list(G2.nodes()))
             big_graph = nx.compose(big_graph, G3_adjusted)
             big_graph.add_edge(controller_node_G2, min(G3_adjusted.nodes))
             for node in G3_adjusted.nodes:
@@ -119,17 +102,16 @@ class GenindNetwork:
 
 
 # 调用函数的参数设置
-N1 = 3
+N1 = 5
 Type1 = "Random Geometric"
-U2 = 3
-N2 = 3
-Type2 = "bus"
-U3 = 9
+U2 = 5
+N2 = 6
+U3 = 12
 N3 = 3
-Type3 = "bus"
 
-# # 调用函数来生成和显示图像
-gein_network = GenindNetwork(N1, Type1, U2, N2, Type2, U3, N3, Type3)
+
+# 调用函数来生成和显示图像
+gein_network = GenindNetwork(N1, Type1, U2, N2, U3, N3)
 
 
 
