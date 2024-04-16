@@ -5,9 +5,9 @@ import random
 
 class GenindNetwork:
 
-    def __init__(self, N1, Type1, U2, N2, U3, N3):
+    def __init__(self, N1, Type1, U2, N2, U3, N3, plot=True):
         self.node_labels = {}
-        self.graph = self.MULTI_GRAPHGENERATOR_AND_DRAW(N1, Type1, U2, N2, U3, N3)
+        self.graph = self.MULTI_GRAPHGENERATOR_AND_DRAW(N1, Type1, U2, N2, U3, N3, plot=plot)
 
 
 
@@ -40,7 +40,7 @@ class GenindNetwork:
         mapping = {node: node + offset for node in G.nodes}
         return nx.relabel_nodes(G, mapping)
 
-    def MULTI_GRAPHGENERATOR_AND_DRAW(self, N1, Type1, U2, N2, U3, N3):
+    def MULTI_GRAPHGENERATOR_AND_DRAW(self, N1, Type1, U2, N2, U3, N3, plot=True):
         G1 = self.NetworkZone_graphGenerator(N1, Type1)
         G2_list = [self.ControlZone_graphGenerator(N2) for _ in range(U2)]
         G3_list = [self.ControlZone_graphGenerator(N3) for _ in range(U3)]
@@ -77,13 +77,14 @@ class GenindNetwork:
                 node_labels[node] = node_labels[controller_node_G2]
             offset += len(G3_adjusted.nodes)
 
-        print(f"Node Labels: {node_labels}")
-        # 使用spring布局
-        pos = nx.spring_layout(big_graph)
+        if plot:
+            print(f"Node Labels: {node_labels}")
+            # 使用spring布局
+            pos = nx.spring_layout(big_graph)
 
-        # 绘制网络图
-        plt.figure(figsize=(12, 8))
-        nx.draw(big_graph, pos, node_color=[node_colors[node] for node in big_graph.nodes()], with_labels=True, node_size=700)
+            # 绘制网络图
+            plt.figure(figsize=(12, 8))
+            nx.draw(big_graph, pos, node_color=[node_colors[node] for node in big_graph.nodes()], with_labels=True, node_size=700)
 
         self.node_labels = node_labels
 
@@ -100,22 +101,50 @@ class GenindNetwork:
 
         return len(permissions)
 
+    def cal_avg_path_time(self, num = 500):
+        # Randomly select num pairs of nodes and calculate the average path length
+        # between them, based on the path length, calculate the average time by random
+
+        total_time = 0
+        for _ in range(num):
+            node1 = random.choice(list(self.graph.nodes))
+            node2 = random.choice(list(self.graph.nodes))
+            path = self.node_to_node_path(node1, node2)
+            total_time += (len(path) - 1) * random.uniform(0.1, 1)
+
+        return total_time / num
+
 
 # 调用函数的参数设置
-N1 = 5
+N1 = 3
 Type1 = "Random Geometric"
-U2 = 5
-N2 = 6
-U3 = 12
+U2 = 3
+N2 = 3
+U3 = 9
 N3 = 3
 
 
 # 调用函数来生成和显示图像
-gein_network = GenindNetwork(N1, Type1, U2, N2, U3, N3)
+# gein_network = GenindNetwork(N1, Type1, U2, N2, U3, N3)
 
 
 
-print(gein_network.node_to_node_path(1, 10))
-print(gein_network.node_to_node_permission(1, 10))
+# print(gein_network.node_to_node_path(1, 10))
+# print(gein_network.node_to_node_permission(1, 10))
+# plt.show()
+# print(gein_network.cal_avg_path_time())
 
+# Generate plot, x-axis is the number of nodes, y-axis is the average path time
+
+x = []
+y = []
+for k in range(1, 9):
+    gein_network = GenindNetwork(N1 * k, Type1, U2 * k, N2 * k, U3 * k, N3 * k, False)
+    x.append(N1 * k + U2 * N2 * k + U3 * N3 * k)
+    y.append(gein_network.cal_avg_path_time())
+
+plt.plot(x, y)
+plt.xlabel("Number of nodes")
+plt.ylabel("Average path time")
 plt.show()
+
