@@ -136,15 +136,38 @@ N3 = 3
 
 # Generate plot, x-axis is the number of nodes, y-axis is the average path time
 
-x = []
-y = []
-for k in range(1, 9):
-    gein_network = GenindNetwork(N1 * k, Type1, U2 * k, N2 * k, U3 * k, N3 * k, False)
-    x.append(N1 * k + U2 * N2 * k + U3 * N3 * k)
-    y.append(gein_network.cal_avg_path_time())
+x1 = []
+y1 = []
+for k in range(N1, 3 * N1):
+    gein_network = GenindNetwork(k, Type1, U2, N2, U3, N3, False)
+    x1.append(k)
+    y1.append(gein_network.cal_avg_path_time())
 
-plt.plot(x, y)
-plt.xlabel("Number of nodes")
+plt.plot(x1, y1)
+plt.xlabel("Number of N1 nodes")
 plt.ylabel("Average path time")
 plt.show()
 
+x2 = []
+y2 = []
+for k in range(N2, 3 * N2):
+    gein_network = GenindNetwork(N1, Type1, U2, k, U3, N3, False)
+    x2.append(k)
+    y2.append(gein_network.cal_avg_path_time())
+
+plt.plot(x2, y2)
+plt.xlabel("Number of N2 nodes")
+plt.ylabel("Average path time")
+plt.show()
+
+x3 = []
+y3 = []
+for k in range(N3, 3 * N3):
+    gein_network = GenindNetwork(N1, Type1, U2, N2, U3, k, False)
+    x3.append(k)
+    y3.append(gein_network.cal_avg_path_time())
+
+plt.plot(x3, y3)
+plt.xlabel("Number of N3 nodes")
+plt.ylabel("Average path time")
+plt.show()
