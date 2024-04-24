@@ -115,59 +115,72 @@ class GenindNetwork:
         return total_time / num
 
 
-# 调用函数的参数设置
-N1 = 3
-Type1 = "Random Geometric"
-U2 = 3
-N2 = 3
-U3 = 9
-N3 = 3
+# Parameters
+N1, Type1, U2, N2, U3, N3 = 3, "Random Geometric", 3, 3, 9, 3
 
+# Plotting setup
+fig, axs = plt.subplots(5, 1, figsize=(12, 9))
 
-# 调用函数来生成和显示图像
-# gein_network = GenindNetwork(N1, Type1, U2, N2, U3, N3)
-
-
-
-# print(gein_network.node_to_node_path(1, 10))
-# print(gein_network.node_to_node_permission(1, 10))
-# plt.show()
-# print(gein_network.cal_avg_path_time())
-
-# Generate plot, x-axis is the number of nodes, y-axis is the average path time
-
+# Plot for varying N1
 x1 = []
 y1 = []
 for k in range(N1, 3 * N1):
     gein_network = GenindNetwork(k, Type1, U2, N2, U3, N3, False)
     x1.append(k)
     y1.append(gein_network.cal_avg_path_time())
+axs[0].plot(x1, y1, label=f"U2={U2}, N2={N2}, U3={U3}, N3={N3}")
+axs[0].set_xlabel("Number of N1 nodes")
+axs[0].set_ylabel("Average path time")
+axs[0].legend()
 
-plt.plot(x1, y1)
-plt.xlabel("Number of N1 nodes")
-plt.ylabel("Average path time")
-plt.show()
-
+# Plot for varying N2
 x2 = []
 y2 = []
 for k in range(N2, 3 * N2):
     gein_network = GenindNetwork(N1, Type1, U2, k, U3, N3, False)
     x2.append(k)
     y2.append(gein_network.cal_avg_path_time())
+axs[1].plot(x2, y2, label=f"N1={N1}, U2={U2}, U3={U3}, N3={N3}")
+axs[1].set_xlabel("Number of N2 nodes")
+axs[1].set_ylabel("Average path time")
+axs[1].legend()
 
-plt.plot(x2, y2)
-plt.xlabel("Number of N2 nodes")
-plt.ylabel("Average path time")
-plt.show()
-
+# Plot for varying N3
 x3 = []
 y3 = []
 for k in range(N3, 3 * N3):
     gein_network = GenindNetwork(N1, Type1, U2, N2, U3, k, False)
     x3.append(k)
     y3.append(gein_network.cal_avg_path_time())
+axs[2].plot(x3, y3, label=f"N1={N1}, U2={U2}, N2={N2}")
+axs[2].set_xlabel("Number of N3 nodes")
+axs[2].set_ylabel("Average path time")
+axs[2].legend()
 
-plt.plot(x3, y3)
-plt.xlabel("Number of N3 nodes")
-plt.ylabel("Average path time")
+
+x4 = []
+y4 = []
+for k in range(U2, 3 * U2):
+    gein_network = GenindNetwork(N1, Type1, k, N2, U3, N3, False)
+    x4.append(k*N2)
+    y4.append(gein_network.cal_avg_path_time())
+axs[3].plot(x4, y4, label=f"N1={N1}, N2={N2}, N3={N3}")
+axs[3].set_xlabel("Number of U2 * N2 nodes")
+axs[3].set_ylabel("Average path time")
+axs[3].legend()
+
+
+x5 = []
+y5 = []
+for k in range(U3, 3 * U3):
+    gein_network = GenindNetwork(N1, Type1, U2, N2, k, N3, False)
+    x5.append(k*N3)
+    y5.append(gein_network.cal_avg_path_time())
+axs[4].plot(x5, y5, label=f"N1={N1}, N2={N2}, N3={N3}")
+axs[4].set_xlabel("Number of U3 * N3 nodes")
+axs[4].set_ylabel("Average path time")
+axs[4].legend()
+
+
+plt.tight_layout()
 plt.show()
