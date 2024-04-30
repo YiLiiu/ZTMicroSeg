@@ -7,8 +7,8 @@ class GenindNetwork:
 
     def __init__(self, N1, Type1, U2, N2, U3, N3, plot=True):
         self.node_labels = {}
+        self.n3 = []
         self.graph = self.MULTI_GRAPHGENERATOR_AND_DRAW(N1, Type1, U2, N2, U3, N3, plot=plot)
-
 
 
     def NetworkZone_graphGenerator(self, N, Type):
@@ -73,6 +73,7 @@ class GenindNetwork:
             big_graph = nx.compose(big_graph, G3_adjusted)
             big_graph.add_edge(controller_node_G2, min(G3_adjusted.nodes))
             for node in G3_adjusted.nodes:
+                self.n3.append(node)
                 node_colors[node] = 'blue'
                 node_labels[node] = node_labels[controller_node_G2]
             offset += len(G3_adjusted.nodes)
@@ -101,14 +102,14 @@ class GenindNetwork:
 
         return len(permissions)
 
-    def cal_avg_path_time(self, num = 500):
+    def cal_avg_path_time(self, num = 10000):
         # Randomly select num pairs of nodes and calculate the average path length
         # between them, based on the path length, calculate the average time by random
 
         total_time = 0
         for _ in range(num):
-            node1 = random.choice(list(self.graph.nodes))
-            node2 = random.choice(list(self.graph.nodes))
+            node1 = random.choice(self.n3)
+            node2 = random.choice(self.n3)
             path = self.node_to_node_path(node1, node2)
             total_time += (len(path) - 1) * random.uniform(0.1, 1)
 
@@ -116,15 +117,17 @@ class GenindNetwork:
 
 
 # Parameters
-N1, Type1, U2, N2, U3, N3 = 3, "Random Geometric", 3, 3, 9, 3
+N1, Type1, U2, N2, U3, N3 = 3, "Random Geometric", 3, 3, 3, 3
+
+# net = GenindNetwork(N1, Type1, U2, N2, U3, N3)
 
 # Plotting setup
-fig, axs = plt.subplots(5, 1, figsize=(12, 9))
+fig, axs = plt.subplots(3, 1, figsize=(12, 9))
 
 # Plot for varying N1
 x1 = []
 y1 = []
-for k in range(N1, 3 * N1):
+for k in range(N1, 5 * N1):
     gein_network = GenindNetwork(k, Type1, U2, N2, U3, N3, False)
     x1.append(k)
     y1.append(gein_network.cal_avg_path_time())
@@ -136,7 +139,7 @@ axs[0].legend()
 # Plot for varying N2
 x2 = []
 y2 = []
-for k in range(N2, 3 * N2):
+for k in range(N2, 5 * N2):
     gein_network = GenindNetwork(N1, Type1, U2, k, U3, N3, False)
     x2.append(k)
     y2.append(gein_network.cal_avg_path_time())
@@ -148,7 +151,7 @@ axs[1].legend()
 # Plot for varying N3
 x3 = []
 y3 = []
-for k in range(N3, 3 * N3):
+for k in range(N3, 5 * N3):
     gein_network = GenindNetwork(N1, Type1, U2, N2, U3, k, False)
     x3.append(k)
     y3.append(gein_network.cal_avg_path_time())
@@ -158,28 +161,28 @@ axs[2].set_ylabel("Average path time")
 axs[2].legend()
 
 
-x4 = []
-y4 = []
-for k in range(U2, 3 * U2):
-    gein_network = GenindNetwork(N1, Type1, k, N2, U3, N3, False)
-    x4.append(k*N2)
-    y4.append(gein_network.cal_avg_path_time())
-axs[3].plot(x4, y4, label=f"N1={N1}, N2={N2}, N3={N3}")
-axs[3].set_xlabel("Number of U2 * N2 nodes")
-axs[3].set_ylabel("Average path time")
-axs[3].legend()
+# x4 = []
+# y4 = []
+# for k in range(U2, 3 * U2):
+#     gein_network = GenindNetwork(N1, Type1, k, N2, U3, N3, False)
+#     x4.append(k*N2)
+#     y4.append(gein_network.cal_avg_path_time())
+# axs[3].plot(x4, y4, label=f"N1={N1}, N2={N2}, N3={N3}")
+# axs[3].set_xlabel("Number of U2 * N2 nodes")
+# axs[3].set_ylabel("Average path time")
+# axs[3].legend()
 
 
-x5 = []
-y5 = []
-for k in range(U3, 3 * U3):
-    gein_network = GenindNetwork(N1, Type1, U2, N2, k, N3, False)
-    x5.append(k*N3)
-    y5.append(gein_network.cal_avg_path_time())
-axs[4].plot(x5, y5, label=f"N1={N1}, N2={N2}, N3={N3}")
-axs[4].set_xlabel("Number of U3 * N3 nodes")
-axs[4].set_ylabel("Average path time")
-axs[4].legend()
+# x5 = []
+# y5 = []
+# for k in range(U3, 3 * U3):
+#     gein_network = GenindNetwork(N1, Type1, U2, N2, k, N3, False)
+#     x5.append(k*N3)
+#     y5.append(gein_network.cal_avg_path_time())
+# axs[4].plot(x5, y5, label=f"N1={N1}, N2={N2}, N3={N3}")
+# axs[4].set_xlabel("Number of U3 * N3 nodes")
+# axs[4].set_ylabel("Average path time")
+# axs[4].legend()
 
 
 plt.tight_layout()
