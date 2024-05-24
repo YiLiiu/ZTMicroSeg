@@ -7,7 +7,7 @@ class GenindNetwork:
 
     def __init__(self, N1, Type1, U2, N2, U3, N3, plot=True):
         self.node_labels = {}
-        self.n3 = []
+        self.n2n3 = {}
         self.graph = self.MULTI_GRAPHGENERATOR_AND_DRAW(N1, Type1, U2, N2, U3, N3, plot=plot)
 
 
@@ -73,7 +73,9 @@ class GenindNetwork:
             big_graph = nx.compose(big_graph, G3_adjusted)
             big_graph.add_edge(controller_node_G2, min(G3_adjusted.nodes))
             for node in G3_adjusted.nodes:
-                self.n3.append(node)
+                if controller_node_G2 not in self.n2n3:
+                    self.n2n3[controller_node_G2] = []
+                self.n2n3[controller_node_G2].append(node)
                 node_colors[node] = 'blue'
                 node_labels[node] = node_labels[controller_node_G2]
             offset += len(G3_adjusted.nodes)
@@ -108,8 +110,9 @@ class GenindNetwork:
 
         total_time = 0
         for _ in range(num):
-            node1 = random.choice(self.n3)
-            node2 = random.choice(self.n3)
+            keys = random.sample(list(self.n2n3.keys()), 2)
+            node1 = random.choice(self.n2n3[keys[0]])
+            node2 = random.choice(self.n2n3[keys[1]])
             path = self.node_to_node_path(node1, node2)
             total_time += (len(path) - 1) * random.uniform(0.1, 1)
 
